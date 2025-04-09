@@ -56,5 +56,5 @@ app.get('/api/download/:fileId', async (req, res) => {
 app.use(express.static('../')); // Ajuste le chemin selon ta structure
 
 app.listen(PORT, () => {
-    console.log(`Serveur démarré sur http://localhost:${PORT}`);
+    console.log(`Serveur démarré sur :${PORT}`);
 });

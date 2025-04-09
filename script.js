@@ -23,7 +23,7 @@ class PDFRenamer {
     }
 
     async loadFiles() {
-        const response = await fetch('http://localhost:3000/api/files');
+        const response = await fetch('http://147.79.114.72:32043/api/files');
         this.files = await response.json();
         this.updateProgress();
         this.showCurrentFile();
@@ -39,7 +39,7 @@ class PDFRenamer {
         this.currentFileSpan.textContent = currentFile.name;
 
         // Télécharger le fichier
-        const response = await fetch(`http://localhost:3000/api/download/${currentFile.id}`);
+        const response = await fetch(`http://147.79.114.72:32043/api/download/${currentFile.id}`);
         const blob = await response.blob();
         
         // Créer une URL temporaire pour afficher le PDF
@@ -60,7 +60,7 @@ class PDFRenamer {
         const currentFile = this.files[this.currentIndex];
 
         // Renommer sur Google Drive
-        await fetch('http://localhost:3000/api/rename', {
+        await fetch('http://147.79.114.72:32043/api/rename', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Renommer PDFs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Renommer les fichiers PDF</h1>
+        
+        <!-- Zone de visualisation -->
+        <div id="pdf-preview">
+            <iframe id="pdf-viewer" width="100%" height="500px"></iframe>
+        </div>
+        
+        <!-- Zone de contrôle -->
+        <div class="controls">
+            <p>Fichier actuel: <span id="current-file"></span></p>
+            <input type="text" id="new-name" placeholder="Nouveau nom">
+            <button id="rename-btn">OK</button>
+            <button id="skip-btn">Passer</button>
+        </div>
+        
+        <p>Progression: <span id="progress">0/0</span></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

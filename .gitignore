@@ -1,0 +1,28 @@
+# Dépendances Node.js
+node_modules/
+npm-debug.log
+
+# Fichiers de configuration sensibles
+backend/config/google-auth.json
+.env
+
+# Fichiers générés ou temporaires
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Répertoires de build ou de distribution (si applicable)
+dist/
+build/
+
+# Fichiers Docker locaux
+Dockerfile.local
+*.dockerignore
+
+# Système local
+.DS_Store
+Thumbs.db
+
+backend/config/google-auth.json
+gleaming-cove-382722-2c6ee248da8f.json

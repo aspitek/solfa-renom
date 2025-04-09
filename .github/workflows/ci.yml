@@ -1,0 +1,97 @@
+name: solfa-renom-ci-dev
+
+on:
+  # Triggers the workflow on push or pull request events for branches starting with "main"
+  push:
+    branches: [ "main" ]
+
+  # Allows manual execution of the workflow from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Vérification des secrets
+        run: |
+            if [ -z "${{ secrets.DOCKER_USERNAME }}" ]; then
+            echo "DOCKER_USERNAME est vide ou non défini"
+            exit 1
+            fi
+            if [ -z "${{ secrets.DOCKER_PASSWORD }}" ]; then
+            echo "DOCKER_PASSWORD est vide ou non défini"
+            exit 1
+            fi
+            if [ -z "${{ secrets.PAT_TOKEN }}" ]; then
+            echo "PAT_TOKEN est vide ou non défini"
+            exit 1
+            fi
+
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/solfa:dev-${{ github.sha }} .
+
+      # Push the Docker image to Docker Hub
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/solfa:dev-${{ github.sha }}
+
+  modifygit:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository from GitHub
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'aspitek/manifests'
+          token: ${{ secrets.PAT_TOKEN }}
+          
+      - name: Checkout le repo du code
+        uses: actions/checkout@v4
+        with:
+          repository: 'aspitek/solfa-renom'
+          token: ${{ secrets.PAT_TOKEN }}
+          path: solfa-renom-code
+  
+        # Copier le ConfigMap
+      - name: Copier le ConfigMap depuis le repo du code
+        run: |
+          mkdir -p solfa-renom/
+          cp solfa-renom-code/k8s/configMap.yml solfa-renom/configMap.yml  
+      # Modify the image in manifest.yml
+      - name: Modify the image in manifest.yml
+        run: |
+          # Configure Git with a generic name and email for GitHub Actions bot
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+          # Print current working directory for debugging
+          echo "Current working directory:"
+          pwd
+
+          # Update the image reference in manifest.yml
+          sed -i "s+image: .*$+image: ${{ secrets.DOCKER_USERNAME }}/solfa:dev-${{ github.sha }}+g" solfa-renom/manifest.yml
+
+          # Stage and commit changes
+          git add solfa-renom/manifest.yml
+          git add solfa-renom/configMap.yml
+          git commit -am 'Updated image to ${{ secrets.DOCKER_USERNAME }}/solfa:dev-${{ github.sha }} by GitHub Actions: Job changemanifest: ${{ github.run_number }}'
+
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use the GitHub token for authentication

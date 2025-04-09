@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solfa-renom
+  namespace: solfa-space
+data:
+  ES_URL: "http://10.242.68.64:9202/"
+
